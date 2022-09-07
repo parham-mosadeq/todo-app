@@ -2,6 +2,9 @@ import React, { useState, useRef } from 'react';
 // *uuid
 import { v4 as uuidv4 } from 'uuid';
 
+import { ToastContainer } from 'react-toastify';
+import { toaster } from '../services/functions';
+
 import Todo from './Todo';
 
 const Todos = () => {
@@ -16,11 +19,13 @@ const Todos = () => {
     setId(uuidv4());
     setTodos([...todos, { id, inputs }]);
     setInputs('');
+    toaster('Added', 'bottom-right');
   };
 
   const handleRemove = (id) => {
     const newItems = todos.filter((item) => item.id !== id);
     setTodos(newItems);
+    toaster('Removed', 'top-right');
   };
 
   const handleDone = (inputs) => {
@@ -32,6 +37,7 @@ const Todos = () => {
     inputRef.current.focus();
     setEdit(e);
     setInputs(`edited:${edit}`);
+    toaster('Edited', 'top-right');
   };
 
   return (
@@ -71,6 +77,7 @@ const Todos = () => {
           return <div key={uuidv4()}></div>;
         }
       })}
+      <ToastContainer />
     </div>
   );
 };
