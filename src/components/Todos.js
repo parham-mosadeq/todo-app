@@ -1,83 +1,115 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 // *uuid
 import { v4 as uuidv4 } from 'uuid';
-
+// *Toaster
 import { ToastContainer } from 'react-toastify';
-import { toaster } from '../services/functions';
-
+// *functions
+import {
+  toasterSuccess,
+  toasterWarning,
+  toasterError,
+  getLocalStorage,
+} from '../services/functions';
+// *Components
 import Todo from './Todo';
 
 const Todos = () => {
   const [inputs, setInputs] = useState('');
   const [id, setId] = useState('');
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState(getLocalStorage());
   const [edit, setEdit] = useState('');
-
+  const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef(null);
 
   const handleAddBtn = () => {
-    setId(uuidv4());
-    setTodos([...todos, { id, inputs }]);
-    setInputs('');
-    toaster('Added', 'bottom-right');
+    if (inputs) {
+      setId(uuidv4());
+      setTodos([...todos, { id, inputs }]);
+      setInputs('');
+      toasterSuccess('Added', 'bottom-right');
+    } else if (!inputs) {
+      toasterError('Please enter a valid data type', 'top-right');
+    }
+    if (todos && isEditing) {
+      setTodos(
+        todos.map((item) => {
+          if (item.id === edit) {
+            toasterWarning('Edited', 'top-right');
+            setIsEditing(false);
+            return { ...item, inputs };
+          }
+          return item;
+        })
+      );
+    }
   };
 
   const handleRemove = (id) => {
-    const newItems = todos.filter((item) => item.id !== id);
+    const newItems = todos.filter((item) => {
+      return item.id !== id;
+    });
     setTodos(newItems);
-    toaster('Removed', 'top-right');
+    toasterError('Removed', 'top-right');
   };
 
   const handleDone = (inputs) => {
-    inputs.target.className = 'line-through';
+    inputs.target.className = 'text-red';
     console.log(inputs.target.className);
   };
 
-  const handleEdit = (e) => {
+  const handleEdit = (id) => {
     inputRef.current.focus();
-    setEdit(e);
-    setInputs(`edited:${edit}`);
-    toaster('Edited', 'top-right');
+    const specificItem = todos.find((item) => item.id === id);
+    setIsEditing(true);
+    setEdit(id);
+    setInputs(specificItem.inputs);
   };
+
+  useEffect(() => {
+    localStorage.setItem('todosItems', JSON.stringify(todos));
+  }, [todos]);
 
   return (
     <div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleAddBtn();
-        }}
-      >
-        <input
-          ref={inputRef}
-          type='text'
-          placeholder='enter todos'
-          value={inputs}
-          onChange={(e) => setInputs(e.target.value)}
-        />
-        <button type='button' onClick={handleAddBtn}>
-          add
-        </button>
-      </form>
+      <h1 className='text-3xl font-bold underline'>todo app</h1>
+      <div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleAddBtn();
+          }}
+        >
+          <input
+            ref={inputRef}
+            type='text'
+            placeholder='enter todos'
+            value={inputs}
+            onChange={(e) => setInputs(e.target.value)}
+          />
+          <button type='button' onClick={handleAddBtn}>
+            {isEditing ? 'edit' : 'add'}
+          </button>
+        </form>
 
-      {todos.map((item) => {
-        const { id, inputs } = item;
-        if (inputs) {
-          return (
-            <Todo
-              key={id}
-              id={id}
-              inputs={inputs}
-              handleRemove={handleRemove}
-              handleDone={handleDone}
-              handleEdit={handleEdit}
-            />
-          );
-        } else {
-          return <div key={uuidv4()}></div>;
-        }
-      })}
-      <ToastContainer />
+        {todos.map((item) => {
+          const { id, inputs } = item;
+          if (inputs) {
+            return (
+              <Todo
+                key={id}
+                id={id}
+                inputs={inputs}
+                handleRemove={handleRemove}
+                handleDone={handleDone}
+                handleEdit={handleEdit}
+              />
+            );
+          } else {
+            return inputs;
+          }
+        })}
+        <ToastContainer />
+      </div>
     </div>
   );
 };

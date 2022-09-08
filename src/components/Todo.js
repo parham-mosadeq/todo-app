@@ -11,13 +11,13 @@ const Todo = ({ handleDone, handleRemove, handleEdit, id, inputs }) => {
           handleDone(e);
         }}
       >
-        {inputs}
+        {inputs || localStorage.getItem(JSON.parse('todos'))}
       </h2>
       <div>
         <button onClick={() => handleRemove(id)}>
           <FaTimes />
         </button>
-        <button onClick={() => handleEdit(inputs)}>
+        <button onClick={() => handleEdit(id)}>
           <FaRegEdit />
         </button>
       </div>
