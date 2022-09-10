@@ -19,7 +19,7 @@ const Footer = () => {
             target='_blank'
             rel='noreferrer'
             className='tracking-widest  hover:text-cyan-300 '
-            href='noreferrer'
+            href='https://www.linkedin.com/in/parham-mosadeqzadeh-01253b1b7'
           >
             linkedin
           </a>
