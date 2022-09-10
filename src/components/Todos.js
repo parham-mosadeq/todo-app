@@ -73,7 +73,7 @@ const Todos = () => {
   return (
     <div className='round-lg bg-neutral-800 min-w-full min-h-screen'>
       <div className='flex justify-center items-center p-4 flex-col'>
-        <h1 className='text-3xl text-cyan-500 tracking-widest font-light text-black uppercase mt-5 mb-5'>
+        <h1 className='text-3xl text-cyan-300 tracking-widest font-light text-black uppercase mt-5 mb-5'>
           todo app
         </h1>
         <div>
